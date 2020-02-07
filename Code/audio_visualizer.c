@@ -44,7 +44,7 @@
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
-    #define NUM_SECONDS     (0.2)
+    #define NUM_SECONDS     (2)
     /* #define DITHER_FLAG     (paDitherOff) */
     #define DITHER_FLAG     (0) 
     
@@ -161,10 +161,9 @@
             goto done;
         }
         for( i=0; i<numSamples; i++ ) data.recordedSamples[i] = 0;
-    
+
         err = Pa_Initialize();
         if( err != paNoError ) goto done;
-
         int numDevices = Pa_GetDeviceCount();
         //fprintf(stderr,"Num devices=%i\n", numDevices);
         inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
@@ -176,9 +175,19 @@
         inputParameters.sampleFormat = PA_SAMPLE_TYPE;
         inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
         inputParameters.hostApiSpecificStreamInfo = NULL;
-    
-        /* Record some audio. -------------------------------------------- */
-        err = Pa_OpenStream(
+
+        kiss_fft_scalar * buf;
+        kiss_fft_cpx * bufout;
+        buf=(kiss_fft_scalar*)malloc(NFFT);
+        bufout=(kiss_fft_cpx*)malloc(NFFT*2);
+        float * mag;
+        mag = (float*)malloc(NFFT/2+1);
+        kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
+
+        printf("Recording...\n\n");
+        for (int frame=0; frame<200; frame++) {
+            /* Record some audio. -------------------------------------------- */
+            err = Pa_OpenStream(
                     &stream,
                     &inputParameters,
                     NULL,                  /* &outputParameters, */
@@ -187,80 +196,56 @@
                     paClipOff,      /* we won't output out of range samples so don't bother clipping them */
                     recordCallback,
                     &data );
-        if( err != paNoError ) goto done;
-    
-        err = Pa_StartStream( stream );
-        if( err != paNoError ) goto done;
-        //printf("\n=== Now recording!! Please speak into the microphone. ===\n"); fflush(stdout);
-    
-        while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
-        {
-            Pa_Sleep(10);
-            //printf("index = %d\n", data.frameIndex ); fflush(stdout);
-        }
-        if( err < 0 ) goto done;
-    
-        err = Pa_CloseStream( stream );
-        if( err != paNoError ) goto done;
+            if( err != paNoError ) goto done;
 
-        //Take FFT
-        kiss_fft_scalar * buf;
-        kiss_fft_cpx * bufout;
-        buf=(kiss_fft_scalar*)malloc(NFFT);
-        bufout=(kiss_fft_cpx*)malloc(NFFT*2);
-        float * mag;
-        mag = (float*)malloc(NFFT/2+1);
-        int max_val = 0;
-        int max_ind = 0;
-
-        for (int i=0; i<NFFT; i++) {
-            buf[i] = data.recordedSamples[i]*10.0;
-        }
-
-        kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
-        kiss_fftr(cfg, buf, bufout);
-
-        // Get real-sided magnitude
-        for (int i=0; i<NFFT/2+1; i++) {
-            mag[i] = bufout[i].r*bufout[i].r + bufout[i].i*bufout[i].i;
-            if (mag[i] > max_val) {
-                max_val = mag[i];
-                max_ind = i;
+            err = Pa_StartStream( stream );
+            if( err != paNoError ) goto done;
+        
+            while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
+            {
+                Pa_Sleep(1000);
             }
+            if( err < 0 ) goto done;
+        
+            err = Pa_CloseStream( stream );
+            if( err != paNoError ) goto done;
+
+            //Take FFT
+            int max_val = 0;
+            int max_ind = 0;
+
+            for (int j=0; j<NFFT; j++) {
+                buf[j] = data.recordedSamples[j]*10.0;
+            }
+
+            kiss_fftr(cfg, buf, bufout);
+
+            // Get real-sided magnitude
+            for (int j=0; j<NFFT/2+1; j++) {
+                mag[j] = bufout[j].r*bufout[j].r + bufout[j].i*bufout[j].i;
+                if (mag[j] > max_val) {
+                    max_val = mag[j];
+                    max_ind = j;
+                }
+            }
+            printf("Frame %i: \tMax Freq = %i Hz\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2);
+            
+            data.frameIndex = 0;
         }
-        printf("Max Freq = %i Hz\n", max_ind*SAMPLE_RATE/2/NFFT*2);
         
         free(cfg);
         free(buf); free(bufout); free(mag);
    
-        /* Write recorded data to a file. */
-        #if WRITE_TO_FILE
-            {
-                FILE  *fid;
-                fid = fopen("recorded.raw", "wb");
-                if( fid == NULL )
-                {
-                    printf("Could not open file.");
-                }
-                else
-                {
-                    fwrite( data.recordedSamples, sizeof(SAMPLE), totalFrames, fid );
-                    fclose( fid );
-                    printf("Wrote data to 'recorded.raw'\n");
-                }
-            }
-        #endif
-   
-   done:
-       Pa_Terminate();
-       if( data.recordedSamples )       /* Sure it is NULL or valid. */
-           free( data.recordedSamples );
-       if( err != paNoError )
-       {
-           fprintf( stderr, "An error occured while using the portaudio stream\n" );
-           fprintf( stderr, "Error number: %d\n", err );
-           fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
-           err = 1;          /* Always return 0 or 1, but no other return codes. */
-       }
-       return err;
+    done:
+        Pa_Terminate();
+        if( data.recordedSamples )       /* Sure it is NULL or valid. */
+            free( data.recordedSamples );
+        if( err != paNoError )
+        {
+            fprintf( stderr, "An error occured while using the portaudio stream\n" );
+            fprintf( stderr, "Error number: %d\n", err );
+            fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
+            err = 1;          /* Always return 0 or 1, but no other return codes. */
+        }
+        return err;
    }
