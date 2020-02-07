@@ -1,0 +1,7 @@
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/install/strip.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/install/local.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/edit_cache.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/kiss-fft.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/rebuild_cache.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/list_install_components.dir
+/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/install.dir
