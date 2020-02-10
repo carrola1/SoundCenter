@@ -164,12 +164,10 @@
 
         err = Pa_Initialize();
         if( err != paNoError ) goto done;
-        //inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-        inputParameters.device = 20;
+        inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
         inputParameters.channelCount = 1;
         inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-        //inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
-        inputParameters.suggestedLatency = 4.635570538864703e-310;
+        inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
         inputParameters.hostApiSpecificStreamInfo = NULL;
 
         kiss_fft_scalar * buf;
