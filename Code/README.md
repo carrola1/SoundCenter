@@ -15,6 +15,6 @@ Adding Kiss-FFT:
     install library:
         cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo
         make
-        make install
+        sudo make install
     compile program using gcc:
         gcc -g -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lm
