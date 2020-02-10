@@ -44,7 +44,7 @@
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
-    #define NUM_SECONDS     (2)
+    #define NUM_SECONDS     (0.1)
     /* #define DITHER_FLAG     (paDitherOff) */
     #define DITHER_FLAG     (0) 
     
@@ -164,28 +164,25 @@
 
         err = Pa_Initialize();
         if( err != paNoError ) goto done;
-        int numDevices = Pa_GetDeviceCount();
-        //fprintf(stderr,"Num devices=%i\n", numDevices);
-        inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-        if (inputParameters.device == paNoDevice) {
-            fprintf(stderr,"Error: No default input device.\n");
-            goto done;
-        }
+        //inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
+        inputParameters.device = 20;
         inputParameters.channelCount = 1;
         inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-        inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+        //inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+        inputParameters.suggestedLatency = 4.635570538864703e-310;
         inputParameters.hostApiSpecificStreamInfo = NULL;
 
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
-        buf=(kiss_fft_scalar*)malloc(NFFT);
-        bufout=(kiss_fft_cpx*)malloc(NFFT*2);
+        buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
+        bufout=(kiss_fft_cpx*)malloc(NFFT*sizeof(SAMPLE)*2);
         float * mag;
-        mag = (float*)malloc(NFFT/2+1);
+        mag = (float*)malloc(NFFT*sizeof(SAMPLE)/2+1);
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
 
         printf("Recording...\n\n");
-        for (int frame=0; frame<200; frame++) {
+        for (int frame=0; frame<10; frame++) {
+            
             /* Record some audio. -------------------------------------------- */
             err = Pa_OpenStream(
                     &stream,
@@ -203,10 +200,13 @@
         
             while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
             {
-                Pa_Sleep(1000);
+                Pa_Sleep(50);
             }
             if( err < 0 ) goto done;
-        
+            
+            err = Pa_StopStream( stream );
+            if( err != paNoError ) goto done;
+
             err = Pa_CloseStream( stream );
             if( err != paNoError ) goto done;
 
