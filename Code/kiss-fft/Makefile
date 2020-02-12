@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_SOURCE_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_BINARY_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -67,18 +67,6 @@ install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
 	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -124,11 +112,23 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -230,12 +230,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... install/strip"
-	@echo "... install/local"
 	@echo "... edit_cache"
 	@echo "... kiss-fft"
 	@echo "... rebuild_cache"
 	@echo "... list_install_components"
 	@echo "... install"
+	@echo "... install/local"
 	@echo "... kiss_fft.o"
 	@echo "... kiss_fft.i"
 	@echo "... kiss_fft.s"

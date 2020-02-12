@@ -59,10 +59,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_SOURCE_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_BINARY_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 #=============================================================================
 # Target rules for target CMakeFiles/kiss-fft.dir
@@ -71,7 +71,7 @@ CMAKE_BINARY_DIR = /home/andrew/Documents/C_Practice/kiss-fft
 CMakeFiles/kiss-fft.dir/all:
 	$(MAKE) -f CMakeFiles/kiss-fft.dir/build.make CMakeFiles/kiss-fft.dir/depend
 	$(MAKE) -f CMakeFiles/kiss-fft.dir/build.make CMakeFiles/kiss-fft.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles --progress-num=1,2,3 "Built target kiss-fft"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles --progress-num=1,2,3 "Built target kiss-fft"
 .PHONY : CMakeFiles/kiss-fft.dir/all
 
 # Include target in all.
@@ -81,9 +81,9 @@ all: CMakeFiles/kiss-fft.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/kiss-fft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles 3
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/kiss-fft.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles 0
 .PHONY : CMakeFiles/kiss-fft.dir/rule
 
 # Convenience name for target.

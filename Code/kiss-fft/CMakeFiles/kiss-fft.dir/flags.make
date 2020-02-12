@@ -6,5 +6,5 @@ C_FLAGS = -O2 -g -DNDEBUG
 
 C_DEFINES = 
 
-C_INCLUDES = -I/home/andrew/Documents/C_Practice/kiss-fft/. 
+C_INCLUDES = -I/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/. 
 

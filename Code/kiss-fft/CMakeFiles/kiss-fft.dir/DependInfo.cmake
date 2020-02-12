@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/andrew/Documents/C_Practice/kiss-fft/kiss_fft.c" "/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/kiss-fft.dir/kiss_fft.c.o"
-  "/home/andrew/Documents/C_Practice/kiss-fft/kiss_fftr.c" "/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/kiss-fft.dir/kiss_fftr.c.o"
+  "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fft.c" "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles/kiss-fft.dir/kiss_fft.c.o"
+  "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fftr.c" "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles/kiss-fft.dir/kiss_fftr.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

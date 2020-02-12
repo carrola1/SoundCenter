@@ -1,0 +1,3 @@
+To re-compile an example:
+cc -I../include -Wall -O3 -g -Wextra -Wno-unused-parameter -c -o c-example.o c-example.c
+cc c-example.o -o c-example -L../lib -lrgbmatrix -lrt -lm -lpthread -lstdc++

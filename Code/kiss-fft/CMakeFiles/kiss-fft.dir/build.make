@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_SOURCE_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/andrew/Documents/C_Practice/kiss-fft
+CMAKE_BINARY_DIR = /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 # Include any dependencies generated for this target.
 include CMakeFiles/kiss-fft.dir/depend.make
@@ -59,29 +59,29 @@ include CMakeFiles/kiss-fft.dir/flags.make
 
 CMakeFiles/kiss-fft.dir/kiss_fft.c.o: CMakeFiles/kiss-fft.dir/flags.make
 CMakeFiles/kiss-fft.dir/kiss_fft.c.o: kiss_fft.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/kiss-fft.dir/kiss_fft.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/kiss-fft.dir/kiss_fft.c.o   -c /home/andrew/Documents/C_Practice/kiss-fft/kiss_fft.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/kiss-fft.dir/kiss_fft.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/kiss-fft.dir/kiss_fft.c.o   -c /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fft.c
 
 CMakeFiles/kiss-fft.dir/kiss_fft.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/kiss-fft.dir/kiss_fft.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/andrew/Documents/C_Practice/kiss-fft/kiss_fft.c > CMakeFiles/kiss-fft.dir/kiss_fft.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fft.c > CMakeFiles/kiss-fft.dir/kiss_fft.c.i
 
 CMakeFiles/kiss-fft.dir/kiss_fft.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/kiss-fft.dir/kiss_fft.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/andrew/Documents/C_Practice/kiss-fft/kiss_fft.c -o CMakeFiles/kiss-fft.dir/kiss_fft.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fft.c -o CMakeFiles/kiss-fft.dir/kiss_fft.c.s
 
 CMakeFiles/kiss-fft.dir/kiss_fftr.c.o: CMakeFiles/kiss-fft.dir/flags.make
 CMakeFiles/kiss-fft.dir/kiss_fftr.c.o: kiss_fftr.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/kiss-fft.dir/kiss_fftr.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/kiss-fft.dir/kiss_fftr.c.o   -c /home/andrew/Documents/C_Practice/kiss-fft/kiss_fftr.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/kiss-fft.dir/kiss_fftr.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/kiss-fft.dir/kiss_fftr.c.o   -c /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fftr.c
 
 CMakeFiles/kiss-fft.dir/kiss_fftr.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/kiss-fft.dir/kiss_fftr.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/andrew/Documents/C_Practice/kiss-fft/kiss_fftr.c > CMakeFiles/kiss-fft.dir/kiss_fftr.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fftr.c > CMakeFiles/kiss-fft.dir/kiss_fftr.c.i
 
 CMakeFiles/kiss-fft.dir/kiss_fftr.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/kiss-fft.dir/kiss_fftr.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/andrew/Documents/C_Practice/kiss-fft/kiss_fftr.c -o CMakeFiles/kiss-fft.dir/kiss_fftr.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fftr.c -o CMakeFiles/kiss-fft.dir/kiss_fftr.c.s
 
 # Object files for target kiss-fft
 kiss__fft_OBJECTS = \
@@ -95,7 +95,7 @@ libkiss-fft.a: CMakeFiles/kiss-fft.dir/kiss_fft.c.o
 libkiss-fft.a: CMakeFiles/kiss-fft.dir/kiss_fftr.c.o
 libkiss-fft.a: CMakeFiles/kiss-fft.dir/build.make
 libkiss-fft.a: CMakeFiles/kiss-fft.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library libkiss-fft.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library libkiss-fft.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/kiss-fft.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/kiss-fft.dir/link.txt --verbose=$(VERBOSE)
 
@@ -109,6 +109,6 @@ CMakeFiles/kiss-fft.dir/clean:
 .PHONY : CMakeFiles/kiss-fft.dir/clean
 
 CMakeFiles/kiss-fft.dir/depend:
-	cd /home/andrew/Documents/C_Practice/kiss-fft && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/andrew/Documents/C_Practice/kiss-fft /home/andrew/Documents/C_Practice/kiss-fft /home/andrew/Documents/C_Practice/kiss-fft /home/andrew/Documents/C_Practice/kiss-fft /home/andrew/Documents/C_Practice/kiss-fft/CMakeFiles/kiss-fft.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/CMakeFiles/kiss-fft.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/kiss-fft.dir/depend
 

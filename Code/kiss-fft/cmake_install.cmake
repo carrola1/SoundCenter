@@ -1,4 +1,4 @@
-# Install script for directory: /home/andrew/Documents/C_Practice/kiss-fft
+# Install script for directory: /home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,14 +38,14 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/andrew/Documents/C_Practice/kiss-fft/libkiss-fft.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/libkiss-fft.a")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
-    "/home/andrew/Documents/C_Practice/kiss-fft/kiss_fft.h"
-    "/home/andrew/Documents/C_Practice/kiss-fft/kiss_fftr.h"
-    "/home/andrew/Documents/C_Practice/kiss-fft/_kiss_fft_guts.h"
+    "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fft.h"
+    "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/kiss_fftr.h"
+    "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/_kiss_fft_guts.h"
     )
 endif()
 
@@ -57,5 +57,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/andrew/Documents/C_Practice/kiss-fft/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/pi/Documents/GitHub/SoundCenter/Code/kiss-fft/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
