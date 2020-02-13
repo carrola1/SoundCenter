@@ -17,11 +17,15 @@ Adding Kiss-FFT:
         make
         sudo make install
     compile program using gcc:
-        gcc -g -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lm
+        gcc -g -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lrgbmatrix -lm
 
-Adding rgbmatrix:
+Compiling rgbmatrix examples:
     run rgb-matrix.sh (use convenience option) to compile everything the first time
     to compile or re-compile a file:
         cc -I../include -Wall -O3 -g -Wextra -Wno-unused-parameter -c -o c-example.o c-example.c
         cc c-example.o -o c-example -L../lib -lrgbmatrix -lrt -lm -lpthread -lstdc++
+
+Putting it all together:
+    copy librgbmatrix.a and librgbmatrix.so.1 from rpi-rgb-led-matrix/lib to user/local/lib
+    gcc -g -Irpi-rgb-led-matrix/include -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -O3 -Wextra -Wno-unused-parameter -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lrgbmatrix -lrt -lm -lpthread -lstdc++
      

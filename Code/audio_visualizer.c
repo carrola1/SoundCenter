@@ -38,8 +38,10 @@
     
     #include <stdio.h>
     #include <stdlib.h>
+    #include <unistd.h>
     #include "portaudio.h"
     #include "kiss_fftr.h"
+    #include "led-matrix-c.h"
     
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
@@ -177,9 +179,33 @@
         float * mag;
         mag = (float*)malloc(NFFT*sizeof(SAMPLE)/2+1);
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
+        
+        struct RGBLedMatrixOptions options;
+        struct RGBLedMatrix *matrix;
+        struct LedCanvas *offscreen_canvas;
+        int width, height;
+        int x, y;
 
-        printf("Recording...\n\n");
-        for (int frame=0; frame<10; frame++) {
+        memset(&options, 0, sizeof(options));
+        options.rows = 32;
+        options.cols = 64;
+        options.chain_length = 1;
+
+        matrix = led_matrix_create_from_options(&options, NULL,NULL);
+
+        offscreen_canvas = led_matrix_create_offscreen_canvas(matrix);
+
+        led_canvas_get_size(offscreen_canvas, &width, &height);
+        
+        for (y = 0; y < height; ++y) {
+            for (x = 0; x < width; ++x) {
+              led_canvas_set_pixel(offscreen_canvas, x, y, 1, 1, 1);
+            }
+        }
+        offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+
+        //printf("Recording...\n\n");
+        for (int frame=0; frame<100; frame++) {
             
             /* Record some audio. -------------------------------------------- */
             err = Pa_OpenStream(
@@ -226,13 +252,30 @@
                     max_ind = j;
                 }
             }
-            printf("Frame %i: \tMax Freq = %i Hz\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2);
+            //printf("Frame %i: \tMax Freq = %i Hz\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2);
+            
+            // Normalize
+            for (int j=0; j<NFFT/2+1; j++) {
+                mag[j] = mag[j]/max_val*32.0;
+            }
+        
+            for (y = 0; y < height; ++y) {
+                for (x = 0; x < width; ++x) {
+                  if (mag[x] >= y) {
+                    led_canvas_set_pixel(offscreen_canvas, x, y, 1, 1, 20);
+                  } else {
+                    led_canvas_set_pixel(offscreen_canvas, x, y, 0, 0, 0);
+                  }
+                }
+            }
+            offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             
             data.frameIndex = 0;
         }
         
         free(cfg);
         free(buf); free(bufout); free(mag);
+        led_matrix_delete(matrix);
    
     done:
         Pa_Terminate();

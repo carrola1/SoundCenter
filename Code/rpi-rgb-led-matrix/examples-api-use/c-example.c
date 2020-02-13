@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   for (i = 0; i < 1000; ++i) {
     for (y = 0; y < height; ++y) {
       for (x = 0; x < width; ++x) {
-        led_canvas_set_pixel(offscreen_canvas, x, y, i & 0xff, x, y);
+        led_canvas_set_pixel(offscreen_canvas, x, y, 10, 1, 50);
       }
     }
 
