@@ -77,66 +77,6 @@
     #define PRINTF_S_FORMAT "%d"
     #endif
     
-    typedef struct
-    {
-        int          frameIndex;  /* Index into sample array. */
-        int          maxFrameIndex;
-        SAMPLE      *recordedSamples;
-    }
-    paTestData;
-    
-    /* This routine will be called by the PortAudio engine when audio is needed.
-    ** It may be called at interrupt level on some machines so don't do anything
-    ** that could mess up the system like calling malloc() or free().
-    */
-    static int recordCallback( const void *inputBuffer, void *outputBuffer,
-                               unsigned long framesPerBuffer,
-                               const PaStreamCallbackTimeInfo* timeInfo,
-                               PaStreamCallbackFlags statusFlags,
-                               void *userData )
-    {
-        paTestData *data = (paTestData*)userData;
-        const SAMPLE *rptr = (const SAMPLE*)inputBuffer;
-        SAMPLE *wptr = &data->recordedSamples[data->frameIndex];
-        long framesToCalc;
-        long i;
-        int finished;
-        unsigned long framesLeft = data->maxFrameIndex - data->frameIndex;
-    
-        (void) outputBuffer; /* Prevent unused variable warnings. */
-        (void) timeInfo;
-        (void) statusFlags;
-        (void) userData;
-    
-        if( framesLeft < framesPerBuffer )
-        {
-            framesToCalc = framesLeft;
-            finished = paComplete;
-        }
-        else
-        {
-            framesToCalc = framesPerBuffer;
-            finished = paContinue;
-        }
-    
-        if( inputBuffer == NULL )
-        {
-            for( i=0; i<framesToCalc; i++ )
-            {
-                *wptr++ = SAMPLE_SILENCE;  /* left */
-            }
-        }
-        else
-        {
-            for( i=0; i<framesToCalc; i++ )
-            {
-                *wptr++ = *rptr++;  /* left */
-            }
-        }
-        data->frameIndex += framesToCalc;
-        return finished;
-    }
-   
     /*******************************************************************/
     int main(void);
     int main(void)
@@ -144,26 +84,14 @@
         PaStreamParameters  inputParameters;
         PaStream*           stream;
         PaError             err = paNoError;
-        paTestData          data;
-        int                 i;
-        int                 totalFrames;
         int                 numSamples;
         int                 numBytes;
     
         //printf("patest_record.c\n"); fflush(stdout);
-    
-        data.maxFrameIndex = totalFrames = NUM_SECONDS * SAMPLE_RATE; /* Record for a few seconds. */
-        data.frameIndex = 0;
-        numSamples = totalFrames;
+        numSamples = NUM_SECONDS * SAMPLE_RATE;
         numBytes = numSamples * sizeof(SAMPLE); 
-        data.recordedSamples = (SAMPLE *) malloc( numBytes ); /* From now on, recordedSamples is initialised. */
-        if( data.recordedSamples == NULL )
-        {
-            printf("Could not allocate record array.\n");
-            goto done;
-        }
-        for( i=0; i<numSamples; i++ ) data.recordedSamples[i] = 0;
 
+        fclose(stderr);
         err = Pa_Initialize();
         if( err != paNoError ) goto done;
         inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
@@ -181,7 +109,7 @@
                     paClipOff,      /* we won't output out of range samples so don't bother clipping them */
                     NULL,
                     NULL );
-
+        freopen("CON", "w", stderr);
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
@@ -215,7 +143,7 @@
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
 
         //printf("Recording...\n\n");
-        for (int frame=0; frame<100; frame++) {
+        for (int frame=0; frame<1000; frame++) {
             
             /* Record some audio. -------------------------------------------- */
             err = Pa_StartStream( stream );
@@ -223,7 +151,7 @@
         
             SAMPLE* mydata;
             mydata = (SAMPLE *) malloc(numBytes);
-            err = Pa_ReadStream (stream, &mydata, FRAMES_PER_BUFFER);
+            err = Pa_ReadStream (stream, mydata, FRAMES_PER_BUFFER);
             if( err != paNoError ) goto done;
             
             err = Pa_StopStream( stream );
@@ -234,7 +162,7 @@
             int max_ind = 0;
 
             for (int j=0; j<NFFT; j++) {
-                buf[j] = data.recordedSamples[j]*10.0;
+                buf[j] = mydata[j]*10.0;
             }
 
             kiss_fftr(cfg, buf, bufout);
@@ -265,7 +193,6 @@
             }
             offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             
-            data.frameIndex = 0;
             free(mydata);
         }
         
@@ -278,8 +205,6 @@
    
     done:
         Pa_Terminate();
-        if( data.recordedSamples )       /* Sure it is NULL or valid. */
-            free( data.recordedSamples );
         if( err != paNoError )
         {
             fprintf( stderr, "An error occured while using the portaudio stream\n" );
