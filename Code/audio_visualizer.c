@@ -145,8 +145,6 @@
         PaStream*           stream;
         PaError             err = paNoError;
         paTestData          data;
-        SAMPLE*             mydata;
-        mydata = (SAMPLE *) malloc( numBytes );
         int                 i;
         int                 totalFrames;
         int                 numSamples;
@@ -157,7 +155,7 @@
         data.maxFrameIndex = totalFrames = NUM_SECONDS * SAMPLE_RATE; /* Record for a few seconds. */
         data.frameIndex = 0;
         numSamples = totalFrames;
-        numBytes = numSamples * sizeof(SAMPLE);
+        numBytes = numSamples * sizeof(SAMPLE); 
         data.recordedSamples = (SAMPLE *) malloc( numBytes ); /* From now on, recordedSamples is initialised. */
         if( data.recordedSamples == NULL )
         {
@@ -181,8 +179,8 @@
                     SAMPLE_RATE,
                     FRAMES_PER_BUFFER,
                     paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-                    paNullCallback,
-                    &data );
+                    NULL,
+                    NULL );
 
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
@@ -223,6 +221,8 @@
             err = Pa_StartStream( stream );
             if( err != paNoError ) goto done;
         
+            SAMPLE* mydata;
+            mydata = (SAMPLE *) malloc(numBytes);
             err = Pa_ReadStream (stream, &mydata, FRAMES_PER_BUFFER);
             if( err != paNoError ) goto done;
             
@@ -266,6 +266,7 @@
             offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             
             data.frameIndex = 0;
+            free(mydata);
         }
         
         err = Pa_CloseStream( stream );
