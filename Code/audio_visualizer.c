@@ -46,7 +46,7 @@
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
-    #define NUM_SECONDS     (0.05)
+    #define NUM_SECONDS     (0.1)
     /* #define DITHER_FLAG     (paDitherOff) */
     #define DITHER_FLAG     (0) 
     
@@ -179,7 +179,7 @@
             
             // Normalize
             for (int j=0; j<NFFT/2+1; j++) {
-                mag[j] = mag[j]/max_val*32.0;
+                mag[j] = mag[j]/max_val*30.0;
             }
         
             for (y = 0; y < height; ++y) {
