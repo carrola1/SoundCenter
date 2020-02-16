@@ -46,7 +46,7 @@
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
-    #define NUM_SECONDS     (0.1)
+    #define NUM_SECONDS     (0.05)
     /* #define DITHER_FLAG     (paDitherOff) */
     #define DITHER_FLAG     (0) 
     
@@ -224,18 +224,17 @@
         
             while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
             {
-                Pa_Sleep(50);
+                Pa_Sleep(1000);
             }
             if( err < 0 ) goto done;
             
             err = Pa_StopStream( stream );
             if( err != paNoError ) goto done;
-
-            err = Pa_CloseStream( stream );
+            err = Pa_CloseStream(stream);
             if( err != paNoError ) goto done;
 
             //Take FFT
-            int max_val = 0;
+            float max_val = 0.0;
             int max_ind = 0;
 
             for (int j=0; j<NFFT; j++) {
@@ -252,7 +251,7 @@
                     max_ind = j;
                 }
             }
-            //printf("Frame %i: \tMax Freq = %i Hz\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2);
+            printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
             
             // Normalize
             for (int j=0; j<NFFT/2+1; j++) {
