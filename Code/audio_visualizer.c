@@ -145,6 +145,8 @@
         PaStream*           stream;
         PaError             err = paNoError;
         paTestData          data;
+        SAMPLE*             mydata;
+        mydata = (SAMPLE *) malloc( numBytes );
         int                 i;
         int                 totalFrames;
         int                 numSamples;
@@ -221,7 +223,7 @@
             err = Pa_StartStream( stream );
             if( err != paNoError ) goto done;
         
-            err = Pa_ReadStream (stream, &data, FRAMES_PER_BUFFER);
+            err = Pa_ReadStream (stream, &mydata, FRAMES_PER_BUFFER);
             if( err != paNoError ) goto done;
             
             err = Pa_StopStream( stream );
