@@ -204,22 +204,20 @@
         }
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
 
+        err = Pa_OpenStream(
+                    &stream,
+                    &inputParameters,
+                    NULL,                  /* &outputParameters, */
+                    SAMPLE_RATE,
+                    FRAMES_PER_BUFFER,
+                    paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+                    recordCallback,
+                    &data );
+
         //printf("Recording...\n\n");
         for (int frame=0; frame<100; frame++) {
             
             /* Record some audio. -------------------------------------------- */
-            err = paNoDevice;
-            while (err != paNoError) {
-                err = Pa_OpenStream(
-                        &stream,
-                        &inputParameters,
-                        NULL,                  /* &outputParameters, */
-                        SAMPLE_RATE,
-                        FRAMES_PER_BUFFER,
-                        paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-                        recordCallback,
-                        &data );
-            }
 
             err = Pa_StartStream( stream );
             if( err != paNoError ) goto done;
@@ -231,8 +229,6 @@
             if( err < 0 ) goto done;
             
             err = Pa_StopStream( stream );
-            if( err != paNoError ) goto done;
-            err = Pa_CloseStream(stream);
             if( err != paNoError ) goto done;
 
             //Take FFT
