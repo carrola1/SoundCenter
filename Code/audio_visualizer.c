@@ -172,6 +172,16 @@
         inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
         inputParameters.hostApiSpecificStreamInfo = NULL;
 
+        err = Pa_OpenStream(
+                    &stream,
+                    &inputParameters,
+                    NULL,                  /* &outputParameters, */
+                    SAMPLE_RATE,
+                    FRAMES_PER_BUFFER,
+                    paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+                    paNullCallback,
+                    &data );
+
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
@@ -208,31 +218,15 @@
         for (int frame=0; frame<100; frame++) {
             
             /* Record some audio. -------------------------------------------- */
-            err = Pa_OpenStream(
-                    &stream,
-                    &inputParameters,
-                    NULL,                  /* &outputParameters, */
-                    SAMPLE_RATE,
-                    FRAMES_PER_BUFFER,
-                    paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-                    recordCallback,
-                    &data );
-            
             err = Pa_StartStream( stream );
             if( err != paNoError ) goto done;
         
-            while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
-            {
-                Pa_Sleep(100);
-            }
-            if( err < 0 ) goto done;
+            err = Pa_ReadStream (stream, &data, FRAMES_PER_BUFFER);
+            if( err != paNoError ) goto done;
             
             err = Pa_StopStream( stream );
             if( err != paNoError ) goto done;
 
-            err = Pa_CloseStream( stream );
-            if( err != paNoError ) goto done;
-            
             //Take FFT
             float max_val = 0.0;
             int max_ind = 0;
@@ -271,6 +265,9 @@
             
             data.frameIndex = 0;
         }
+        
+        err = Pa_CloseStream( stream );
+        if( err != paNoError ) goto done;
         
         free(cfg);
         free(buf); free(bufout); free(mag);
