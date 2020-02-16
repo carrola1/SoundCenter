@@ -164,6 +164,14 @@
         }
         for( i=0; i<numSamples; i++ ) data.recordedSamples[i] = 0;
 
+        err = Pa_Initialize();
+        if( err != paNoError ) goto done;
+        inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
+        inputParameters.channelCount = 1;
+        inputParameters.sampleFormat = PA_SAMPLE_TYPE;
+        inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+        inputParameters.hostApiSpecificStreamInfo = NULL;
+
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
@@ -199,32 +207,26 @@
         //printf("Recording...\n\n");
         for (int frame=0; frame<100; frame++) {
             
-            err = Pa_Initialize();
-            if( err != paNoError ) goto done;
-            inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-            inputParameters.channelCount = 1;
-            inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-            inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
-            inputParameters.hostApiSpecificStreamInfo = NULL;
-
             /* Record some audio. -------------------------------------------- */
-            err = Pa_OpenStream(
-                    &stream,
-                    &inputParameters,
-                    NULL,                  /* &outputParameters, */
-                    SAMPLE_RATE,
-                    FRAMES_PER_BUFFER,
-                    paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-                    recordCallback,
-                    &data );
-            if( err != paNoError ) goto done;
+            err = paNoDevice;
+            while (err != paNoError) {
+                err = Pa_OpenStream(
+                        &stream,
+                        &inputParameters,
+                        NULL,                  /* &outputParameters, */
+                        SAMPLE_RATE,
+                        FRAMES_PER_BUFFER,
+                        paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+                        recordCallback,
+                        &data );
+            }
 
             err = Pa_StartStream( stream );
             if( err != paNoError ) goto done;
         
             while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
             {
-                Pa_Sleep(1000);
+                Pa_Sleep(100);
             }
             if( err < 0 ) goto done;
             
@@ -270,7 +272,6 @@
             offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             
             data.frameIndex = 0;
-            Pa_Terminate();
         }
         
         free(cfg);
