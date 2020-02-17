@@ -47,49 +47,31 @@
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
     #define NUM_SECONDS     (0.1)
-    /* #define DITHER_FLAG     (paDitherOff) */
-    #define DITHER_FLAG     (0) 
-    
-    #define WRITE_TO_FILE   (0)
-
-    #define NFFT           (256)
+    #define NFFT           (512)
+    #define NUM_MATRIX_BINS (32)
     
     /* Select sample format. */
-    #if 1
     #define PA_SAMPLE_TYPE  paFloat32
     typedef float SAMPLE;
-    #define SAMPLE_SILENCE  (0.0f)
-    #define PRINTF_S_FORMAT "%.8f"
-    #elif 1
-    #define PA_SAMPLE_TYPE  paInt16
-    typedef short SAMPLE;
-    #define SAMPLE_SILENCE  (0)
-    #define PRINTF_S_FORMAT "%d"
-    #elif 0
-    #define PA_SAMPLE_TYPE  paInt8
-    typedef char SAMPLE;
-    #define SAMPLE_SILENCE  (0)
-    #define PRINTF_S_FORMAT "%d"
-    #else
-    #define PA_SAMPLE_TYPE  paUInt8
-    typedef unsigned char SAMPLE;
-    #define SAMPLE_SILENCE  (128)
-    #define PRINTF_S_FORMAT "%d"
-    #endif
     
     /*******************************************************************/
     int main(void);
     int main(void)
     {
+        /*******************************************************************/
+        // Initialize and open PortAudio stream
+        /*******************************************************************/
         PaStreamParameters  inputParameters;
         PaStream*           stream;
         PaError             err = paNoError;
         int                 numSamples;
         int                 numBytes;
     
-        //printf("patest_record.c\n"); fflush(stdout);
         numSamples = NUM_SECONDS * SAMPLE_RATE;
-        numBytes = numSamples * sizeof(SAMPLE); 
+        numBytes = numSamples * sizeof(SAMPLE);
+
+        SAMPLE* audio_data;
+        audio_data = (SAMPLE *) malloc(numBytes); 
 
         fclose(stderr);
         err = Pa_Initialize();
@@ -109,15 +91,23 @@
                     paClipOff,      /* we won't output out of range samples so don't bother clipping them */
                     NULL,
                     NULL );
+        if( err != paNoError ) goto done;
         freopen("CON", "w", stderr);
+
+        /*******************************************************************/
+        // Initialize and configure FFT
+        /*******************************************************************/
         kiss_fft_scalar * buf;
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
         bufout=(kiss_fft_cpx*)malloc(NFFT*sizeof(SAMPLE)*2);
         float * mag;
-        mag = (float*)malloc(NFFT*sizeof(SAMPLE)/2+1);
+        mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
         
+        /*******************************************************************/
+        // Initialize RGB Matrix
+        /*******************************************************************/
         struct RGBLedMatrixOptions options;
         struct RGBLedMatrix *matrix;
         struct LedCanvas *offscreen_canvas;
@@ -134,6 +124,7 @@
         offscreen_canvas = led_matrix_create_offscreen_canvas(matrix);
 
         led_canvas_get_size(offscreen_canvas, &width, &height);
+        int MATRIX_BIN_WIDTH = width/NUM_MATRIX_BINS;
         
         for (y = 0; y < height; ++y) {
             for (x = 0; x < width; ++x) {
@@ -145,34 +136,32 @@
         float max_val;
         int max_ind;
 
-        //printf("Recording...\n\n");
+        /*******************************************************************/
+        // Main loop
+        /*******************************************************************/
         for (int frame=0; frame<1000; frame++) {
             
-            /* Record some audio. -------------------------------------------- */
+            /* Record some audio. ---------------------------------------- */
             err = Pa_StartStream( stream );
-            if( err != paNoError ) printf("Start Error\n");
+            if( err != paNoError ) goto done;
         
-            SAMPLE* mydata;
-            mydata = (SAMPLE *) malloc(numBytes);
-            err = Pa_ReadStream (stream, mydata, FRAMES_PER_BUFFER);
-            if( err != paNoError ) printf("Read Error\n");
+            err = Pa_ReadStream (stream, audio_data, FRAMES_PER_BUFFER);
+            if( err != paNoError ) goto done;
             
             err = Pa_StopStream( stream );
-            if( err != paNoError ) printf("Stop Error\n");
+            if( err != paNoError ) goto done;
 
-            //Take FFT
-
+            /* Take FFT. ------------------------------------------------- */
             for (int j=0; j<NFFT; j++) {
-                buf[j] = mydata[j]*10.0;
+                buf[j] = audio_data[j]*10.0;
             }
-
             kiss_fftr(cfg, buf, bufout);
             
-
+            /* Find max FFT bin and normalize----------------------------- */
             max_val = 0.001;
             max_ind = 0;
             // Get real-sided magnitude
-            for (int j=0; j<NFFT/2+1; j++) {
+            for (int j=0; j<NUM_MATRIX_BINS; j++) {
                 mag[j] = bufout[j].r*bufout[j].r + bufout[j].i*bufout[j].i;
                 if (mag[j] > max_val) {
                     max_val = mag[j];
@@ -185,26 +174,30 @@
             for (int j=0; j<NFFT/2+1; j++) {
                 mag[j] = mag[j]/max_val*30.0;
             }
-        
+
+            /* Update matrix. ------------------------------------------- */
             for (y = 0; y < height; ++y) {
-                for (x = 0; x < width; ++x) {
-                  if (mag[x] >= y) {
-                    led_canvas_set_pixel(offscreen_canvas, x, 31-y, 1, 1, 20);
+                for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
+                  if (mag[x/MATRIX_BIN_WIDTH] >= y) {
+                    for (k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 20);
+                    }
                   } else {
-                    led_canvas_set_pixel(offscreen_canvas, x, 31-y, 0, 0, 0);
+                    for (k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
+                    }
                   }
                 }
             }
             offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             
-            free(mydata);
         }
         
         err = Pa_CloseStream( stream );
         if( err != paNoError ) goto done;
         
         free(cfg);
-        free(buf); free(bufout); free(mag);
+        free(buf); free(bufout); free(mag); free(audio_data);
         led_matrix_delete(matrix);
         printf("Done!\n");
    
