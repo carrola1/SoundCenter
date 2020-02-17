@@ -46,7 +46,7 @@
     /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (512)
-    #define NUM_SECONDS     (0.1)
+    #define NUM_SECONDS     (0.3)
     #define NFFT           (512)
     #define NUM_MATRIX_BINS (32)
     
@@ -159,10 +159,10 @@
             
             /* Find max FFT bin and normalize----------------------------- */
             max_val = 0.001;
-            max_ind = 0;
+            max_ind = 2;
             // Get real-sided magnitude
             for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                mag[j] = bufout[j].r*bufout[j].r + bufout[j].i*bufout[j].i;
+                mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
                 if (mag[j] > max_val) {
                     max_val = mag[j];
                     max_ind = j;
@@ -171,19 +171,33 @@
             printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
             
             // Normalize
-            for (int j=0; j<NFFT/2+1; j++) {
-                mag[j] = mag[j]/max_val*30.0;
+            if (max_val > 10) {
+                for (int j=0; j<NFFT/2+1; j++) {
+                    mag[j] = mag[j]/max_val*30.0;
+                }
+            } else {
+                for (int j=0; j<NFFT/2+1; j++) {
+                    mag[j] = 0;
+                }
             }
 
             /* Update matrix. ------------------------------------------- */
             for (y = 0; y < height; ++y) {
                 for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
                   if (mag[x/MATRIX_BIN_WIDTH] >= y) {
-                    for (k = 0; k < MATRIX_BIN_WIDTH; ++k) {
-                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 20);
+                    for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                        if (y < 12) {
+                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 50);
+                        } else if (y < 22) {
+                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 50, 1);
+                        } else if (y < 26) {
+                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 40, 20, 1);
+                        } else {
+                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 30, 30, 1);
+                        }
                     }
                   } else {
-                    for (k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                    for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
                         led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
                     }
                   }
