@@ -129,7 +129,7 @@
         options.cols = 64;
         options.chain_length = 1;
 
-        matrix = led_matrix_create_from_options(&options, NULL,NULL);
+        matrix = led_matrix_create_from_options(&options, NULL, NULL);
 
         offscreen_canvas = led_matrix_create_offscreen_canvas(matrix);
 
@@ -137,36 +137,40 @@
         
         for (y = 0; y < height; ++y) {
             for (x = 0; x < width; ++x) {
-              led_canvas_set_pixel(offscreen_canvas, x, y, 1, 1, 1);
+              led_canvas_set_pixel(offscreen_canvas, x, y, 0, 0, 0);
             }
         }
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+
+        float max_val;
+        int max_ind;
 
         //printf("Recording...\n\n");
         for (int frame=0; frame<1000; frame++) {
             
             /* Record some audio. -------------------------------------------- */
             err = Pa_StartStream( stream );
-            if( err != paNoError ) goto done;
+            if( err != paNoError ) printf("Start Error\n");
         
             SAMPLE* mydata;
             mydata = (SAMPLE *) malloc(numBytes);
             err = Pa_ReadStream (stream, mydata, FRAMES_PER_BUFFER);
-            if( err != paNoError ) goto done;
+            if( err != paNoError ) printf("Read Error\n");
             
             err = Pa_StopStream( stream );
-            if( err != paNoError ) goto done;
+            if( err != paNoError ) printf("Stop Error\n");
 
             //Take FFT
-            float max_val = 0.0;
-            int max_ind = 0;
 
             for (int j=0; j<NFFT; j++) {
                 buf[j] = mydata[j]*10.0;
             }
 
             kiss_fftr(cfg, buf, bufout);
+            
 
+            max_val = 0.001;
+            max_ind = 0;
             // Get real-sided magnitude
             for (int j=0; j<NFFT/2+1; j++) {
                 mag[j] = bufout[j].r*bufout[j].r + bufout[j].i*bufout[j].i;
@@ -185,9 +189,9 @@
             for (y = 0; y < height; ++y) {
                 for (x = 0; x < width; ++x) {
                   if (mag[x] >= y) {
-                    led_canvas_set_pixel(offscreen_canvas, x, y, 1, 1, 20);
+                    led_canvas_set_pixel(offscreen_canvas, x, 31-y, 1, 1, 20);
                   } else {
-                    led_canvas_set_pixel(offscreen_canvas, x, y, 0, 0, 0);
+                    led_canvas_set_pixel(offscreen_canvas, x, 31-y, 0, 0, 0);
                   }
                 }
             }
@@ -202,6 +206,7 @@
         free(cfg);
         free(buf); free(bufout); free(mag);
         led_matrix_delete(matrix);
+        printf("Done!\n");
    
     done:
         Pa_Terminate();
