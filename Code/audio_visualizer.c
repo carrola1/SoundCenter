@@ -42,6 +42,7 @@
     #include "portaudio.h"
     #include "kiss_fftr.h"
     #include "led-matrix-c.h"
+    #include "pigpio.h"
     
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (2048)
@@ -133,6 +134,12 @@
 
         float max_val;
         //int max_ind;
+
+        /*******************************************************************/
+        // Initizalize GPIO
+        /*******************************************************************/
+        gpioInitialise();
+        gpioSetMode(25, PI_INPUT);
 
         /*******************************************************************/
         // Main loop
