@@ -21,18 +21,11 @@ Adding Kiss-FFT:
 
 Compiling rgbmatrix examples:
     run rgb-matrix.sh (use convenience option) to compile everything the first time
-    copy librgbmatrix.a and librgbmatrix.so.1 from rpi-rgb-led-matrix/lib to user/local/lib
     to compile or re-compile a file:
         cc -I../include -Wall -O3 -g -Wextra -Wno-unused-parameter -c -o c-example.o c-example.c
         cc c-example.o -o c-example -L../lib -lrgbmatrix -lrt -lm -lpthread -lstdc++
 
-Adding Raspberry Pi GPIO
-    wget https://github.com/joan2937/pigpio/archive/v74.zip
-    unzip v74.zip
-    cd pigpio-74
-    make
-    sudo make install
-
-Compile everything together:
-    gcc -g -Irpi-rgb-led-matrix/include -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -O3 -Wextra -Wno-unused-parameter -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lrgbmatrix -lpigpio -lrt -lm -lpthread -lstdc++
+Putting it all together:
+    copy librgbmatrix.a and librgbmatrix.so.1 from rpi-rgb-led-matrix/lib to user/local/lib
+    gcc -g -Irpi-rgb-led-matrix/include -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -O3 -Wextra -Wno-unused-parameter -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lrgbmatrix -lrt -lm -lpthread -lstdc++
      
