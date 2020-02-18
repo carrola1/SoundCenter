@@ -140,76 +140,80 @@
         /*******************************************************************/
         gpioInitialise();
         gpioSetMode(25, PI_INPUT);
+        gpioSetPullUpDown(25, PI_PUD_UP);
 
         /*******************************************************************/
         // Main loop
         /*******************************************************************/
         while(1) {
-            
-            /* Record some audio. ---------------------------------------- */
-            err = Pa_StartStream( stream );
-            if( err != paNoError ) goto done;
-        
-            err = Pa_ReadStream (stream, audio_data, FRAMES_PER_BUFFER);
-            if( err != paNoError ) goto done;
-            
-            err = Pa_StopStream( stream );
-            if( err != paNoError ) goto done;
+            if (gpioRead(25) == 0) {
+                for (int frame = 0; frame < 1000; frame++) {
+                    /* Record some audio. ---------------------------------------- */
+                    err = Pa_StartStream( stream );
+                    if( err != paNoError ) goto done;
+                
+                    err = Pa_ReadStream (stream, audio_data, FRAMES_PER_BUFFER);
+                    if( err != paNoError ) goto done;
+                    
+                    err = Pa_StopStream( stream );
+                    if( err != paNoError ) goto done;
 
-            /* Take FFT. ------------------------------------------------- */
-            for (int j=0; j<NFFT; j++) {
-                buf[j] = audio_data[j]*10.0;
-            }
-            kiss_fftr(cfg, buf, bufout);
-            
-            /* Find max FFT bin and normalize----------------------------- */
-            max_val = 0.001;
-            //max_ind = 2;
-            // Get real-sided magnitude
-            for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
-                if (mag[j] > max_val) {
-                    max_val = mag[j];
-                    //max_ind = j;
-                }
-            }
-            //printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
-            
-            // Normalize
-            if (max_val > 20) {
-                for (int j=0; j<NFFT/2+1; j++) {
-                    mag[j] = mag[j]/max_val*30.0;
-                }
-            } else {
-                for (int j=0; j<NFFT/2+1; j++) {
-                    mag[j] = 0;
-                }
-            }
-
-            /* Update matrix. ------------------------------------------- */
-            for (y = 0; y < height; ++y) {
-                for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
-                  if (mag[x/MATRIX_BIN_WIDTH] >= y) {
-                    for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
-                        if (y < 12) {
-                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
-                        } else if (y < 22) {
-                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 100, 1);
-                        } else if (y < 26) {
-                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 80, 40, 1);
-                        } else {
-                            led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 50, 50, 1);
+                    /* Take FFT. ------------------------------------------------- */
+                    for (int j=0; j<NFFT; j++) {
+                        buf[j] = audio_data[j]*10.0;
+                    }
+                    kiss_fftr(cfg, buf, bufout);
+                    
+                    /* Find max FFT bin and normalize----------------------------- */
+                    max_val = 0.001;
+                    //max_ind = 2;
+                    // Get real-sided magnitude
+                    for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                        mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
+                        if (mag[j] > max_val) {
+                            max_val = mag[j];
+                            //max_ind = j;
                         }
                     }
-                  } else {
-                    for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
-                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
+                    //printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
+                    
+                    // Normalize
+                    if (max_val > 20) {
+                        for (int j=0; j<NFFT/2+1; j++) {
+                            mag[j] = mag[j]/max_val*30.0;
+                        }
+                    } else {
+                        for (int j=0; j<NFFT/2+1; j++) {
+                            mag[j] = 0;
+                        }
                     }
-                  }
+
+                    /* Update matrix. ------------------------------------------- */
+                    for (y = 0; y < height; ++y) {
+                        for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
+                        if (mag[x/MATRIX_BIN_WIDTH] >= y) {
+                            for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                                if (y < 12) {
+                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
+                                } else if (y < 22) {
+                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 100, 1);
+                                } else if (y < 26) {
+                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 80, 40, 1);
+                                } else {
+                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 50, 50, 1);
+                                }
+                            }
+                        } else {
+                            for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                                led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
+                            }
+                        }
+                        }
+                    }
+                    offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+                    
                 }
             }
-            offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
-            
         }
         
         err = Pa_CloseStream( stream );
