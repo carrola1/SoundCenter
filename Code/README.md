@@ -35,4 +35,18 @@ Adding Raspberry Pi GPIO
 
 Compile everything together:
     gcc -g -Irpi-rgb-led-matrix/include -L/usr/local/lib -Wl,-rpath=/usr/local/lib -Wall -O3 -Wextra -Wno-unused-parameter -o audio_visualizer audio_visualizer.c -lportaudio -lkiss-fft -lrgbmatrix -lpigpio -lrt -lm -lpthread -lstdc++
+
+Running application at startup:
+    sudo nano /lib/systemd/system/audio_visualizer.service
+        [Unit]
+        Description=Run Audio Visualizer App
+        After=network-online.target
+
+        [Service]
+        ExecStart=/home/pi/Documents/GitHub/SoundCenter/Code/audio_visualizer
+
+        [Install]
+        WantedBy=multi-user.target
+    sudo systemctl daemon-reload
+    sudo systemctl enable audio_visualizer.service
      
