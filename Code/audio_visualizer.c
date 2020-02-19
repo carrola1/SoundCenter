@@ -191,27 +191,34 @@
                     /* Update matrix. ------------------------------------------- */
                     for (y = 0; y < height; ++y) {
                         for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
-                        if (mag[x/MATRIX_BIN_WIDTH] >= y) {
-                            for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
-                                if (y < 12) {
-                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
-                                } else if (y < 22) {
-                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 100, 1);
-                                } else if (y < 26) {
-                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 80, 40, 1);
-                                } else {
-                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 50, 50, 1);
+                            if (mag[x/MATRIX_BIN_WIDTH] >= y) {
+                                for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                                    if (y < 12) {
+                                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
+                                    } else if (y < 22) {
+                                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 100, 1);
+                                    } else if (y < 26) {
+                                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 80, 40, 1);
+                                    } else {
+                                        led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 50, 50, 1);
+                                    }
+                                }
+                            } else {
+                                for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
+                                    led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
                                 }
                             }
-                        } else {
-                            for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
-                                led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 0, 0, 0);
-                            }
-                        }
                         }
                     }
                     offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
                     
+                }
+
+                /* Shut off matrix after loop. ---------------------------------- */
+                for (y = 0; y < height; ++y) {
+                    for (x = 0; x < width; ++x) {
+                        led_canvas_set_pixel(offscreen_canvas, x, 31-y, 0, 0, 0);
+                    }
                 }
             }
         }
