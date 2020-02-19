@@ -53,6 +53,9 @@
     /* Select sample format. */
     #define PA_SAMPLE_TYPE  paFloat32
     typedef float SAMPLE;
+
+    // Make stream global so it can be terminated
+    PaStream* stream;
     
     /*******************************************************************/
     void termination_handler(int signum);
@@ -80,7 +83,6 @@
         // Initialize and open PortAudio stream
         /*******************************************************************/
         PaStreamParameters  inputParameters;
-        PaStream*           stream;
         PaError             err = paNoError;
         int                 numSamples;
         int                 numBytes;
@@ -268,7 +270,6 @@
     /*******************************************************************/
     void termination_handler (int signum)
     {
-        led_matrix_delete(matrix);
         Pa_CloseStream( stream );
         Pa_Terminate();
     }
