@@ -39,6 +39,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <unistd.h>
+    #include <signal.h>
     #include "portaudio.h"
     #include "kiss_fftr.h"
     #include "led-matrix-c.h"
@@ -57,6 +58,23 @@
     int main(void);
     int main(void)
     {
+        /*******************************************************************/
+        // Setup termination handler
+        /*******************************************************************/
+        struct sigaction new_action, old_action;
+
+        /* Set up the structure to specify the new action. */
+        new_action.sa_handler = termination_handler;
+        sigemptyset (&new_action.sa_mask);
+        new_action.sa_flags = 0;
+
+        sigaction (SIGINT, NULL, &old_action);
+        if (old_action.sa_handler != SIG_IGN)
+            sigaction (SIGINT, &new_action, NULL);
+        sigaction (SIGTERM, NULL, &old_action);
+        if (old_action.sa_handler != SIG_IGN)
+            sigaction (SIGTERM, &new_action, NULL);
+
         /*******************************************************************/
         // Initialize and open PortAudio stream
         /*******************************************************************/
@@ -242,4 +260,14 @@
             err = 1;          /* Always return 0 or 1, but no other return codes. */
         }
         return err;
-   }
+    }
+
+    /*******************************************************************/
+    // Terminate PortAudio in case of Ctrl-C
+    /*******************************************************************/
+    void termination_handler (int signum)
+    {
+        led_matrix_delete(matrix);
+        Pa_CloseStream( stream );
+        Pa_Terminate();
+    }
