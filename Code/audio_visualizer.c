@@ -55,6 +55,7 @@
     typedef float SAMPLE;
     
     /*******************************************************************/
+    void termination_handler(int signum);
     int main(void);
     int main(void)
     {
