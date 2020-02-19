@@ -54,36 +54,16 @@
     #define PA_SAMPLE_TYPE  paFloat32
     typedef float SAMPLE;
 
-    // Make stream global so it can be terminated
-    PaStream* stream;
-    
     /*******************************************************************/
-    void termination_handler(int signum);
     int main(void);
     int main(void)
     {
-        /*******************************************************************/
-        // Setup termination handler
-        /*******************************************************************/
-        struct sigaction new_action, old_action;
-
-        /* Set up the structure to specify the new action. */
-        new_action.sa_handler = termination_handler;
-        sigemptyset (&new_action.sa_mask);
-        new_action.sa_flags = 0;
-
-        sigaction (SIGINT, NULL, &old_action);
-        if (old_action.sa_handler != SIG_IGN)
-            sigaction (SIGINT, &new_action, NULL);
-        sigaction (SIGTERM, NULL, &old_action);
-        if (old_action.sa_handler != SIG_IGN)
-            sigaction (SIGTERM, &new_action, NULL);
-
         /*******************************************************************/
         // Initialize and open PortAudio stream
         /*******************************************************************/
         PaStreamParameters  inputParameters;
         PaError             err = paNoError;
+        PaStream*           stream;
         int                 numSamples;
         int                 numBytes;
     
@@ -263,13 +243,4 @@
             err = 1;          /* Always return 0 or 1, but no other return codes. */
         }
         return err;
-    }
-
-    /*******************************************************************/
-    // Terminate PortAudio in case of Ctrl-C
-    /*******************************************************************/
-    void termination_handler (int signum)
-    {
-        Pa_CloseStream( stream );
-        Pa_Terminate();
     }
