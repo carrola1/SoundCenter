@@ -220,6 +220,7 @@
                         led_canvas_set_pixel(offscreen_canvas, x, 31-y, 0, 0, 0);
                     }
                 }
+                offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
             }
         }
         
