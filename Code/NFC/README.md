@@ -27,3 +27,8 @@ Installing libnfc:
         $ rm -f aclocal.m4
         $ aclocal && libtoolize --force && autoreconf
         - then went back to configure package step and repeated everything through Build/Install
+        
+Installing I2S driver:
+    - curl -sS https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/i2samp.sh | bash
+    - select yes for playback in the background at boot
+    - Re-run the script again to test the speaker
