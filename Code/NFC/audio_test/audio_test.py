@@ -7,21 +7,46 @@ outfile = 'snuggle_puppy_processed.wav'
 
 with audioread.audio_open(infile) as f:
     totalsec = f.duration
-print(totalsec)
 
-fx = (
-    AudioEffectsChain()
-    .pitch(0)
-    #.reverb()
-    #.phaser(0.6, 0.66, 3, 0.6, 2, True)
-    #.chorus(0.5, 0.9, [[50, 0.4, 0.25, 2, 't'], [60, 0.32, 0.4, 2.3, 't'], [40, 0.3, 0.3, 1.3, 's']])
-    #.overdrive(20, 20)
-    #.bend([['.35', '180', '2'], ['2', '740', '1'], ['4', '-500', '2'], ['0', '-520', '1']])
-    .bend([['0', '520', str(totalsec/4)], ['4', '-520', str(totalsec/4)]])
+# 0-15 values
+pitch = 8
+chorus = 15
+overdrive = 5
+bend = 5
 
-)
+# Translate Switch Inputs
+pitch_param = (pitch-8)*100
+
+# chorus(gain-in, gain-out, [delay, decay, speed, depth, sine/triangle])
+chorus_param = [0]*max(int(chorus/3), 1)
+for ii in range(0, max(int(chorus/3), 1)):
+    if (ii % 2 == 0):
+        chorus_param[ii] = [(ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 1.6+0.2*(ii-2), 't']
+    else:
+        chorus_param[ii] = [(ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 2, 's']
+
+overdrive_param = overdrive*2.2
+
+# bend([delay, freq_shift, duration])
+num_bends = max(int((bend+1)/2), 1) # up to 8 bends
+bend_duration = (totalsec - 0.1)/num_bends/2
+bend_param = [0]*num_bends
+for ii in range(0, num_bends):
+    if (ii % 2 == 0):
+        bend_param[ii] = [(ii+1)*bend_duration/2, 300*(ii+1), bend_duration]
+    else:
+        bend_param[ii] = [(ii+1)*bend_duration/2, -300*(ii+1), bend_duration]
+    bend_param[ii] = [str(jj) for jj in bend_param[ii]]
+print(bend_param)
+
+fx.pitch(pitch_param)
+if (chorus > 0):
+    fx.chorus(0.5, 0.9, chorus_param)
+if (overdrive > 0):
+    fx.overdrive(overdrive_param)
+    fx.vol(-overdrive_param/2, 'dB')
+if (bend > 0):
+    fx.bend(bend_param)
 
 # Apply phaser and reverb directly to an audio file.
 fx(infile)
-
-#playsound(outfile)
