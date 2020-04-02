@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-#import audioread
-#from subprocess import PIPE, Popen
+import audioread
+from subprocess import PIPE, Popen
 
 #cmd = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/libnfc/libnfc-1.7.0/examples/nfc-poll'
 #stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
@@ -9,11 +9,11 @@
 
 infile = 'snuggle_puppy.wav'
 
-#with audioread.audio_open(infile) as f:
-#    totalsec = f.duration
+with audioread.audio_open(infile) as f:
+    totalsec = f.duration
 
 # 0-15 values
-pitch = 12
+pitch = 5
 chorus = 1
 bend = 0
 
@@ -24,9 +24,9 @@ pitch_param = ['pitch', str((pitch-8)*100)]
 chorus_param = ['chorus']
 for ii in range(0, max(int(chorus/3), 1)):
     if (ii % 2 == 0):
-        chorus_param = chorus_param + ['{:.2f}'.format(x) for x in [(ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 1.6+0.2*(ii-2)]] + ['t']
+        chorus_param = chorus_param + ['{:.2f}'.format(x) for x in [0.7, 0.9, (ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 1.6+0.2*(ii-2)]] + ['t']
     else:
-        chorus_param = chorus_param + ['{:.2f}'.format(x) for x in [(ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 2]] + ['s']
+        chorus_param = chorus_param + ['{:.2f}'.format(x) for x in [0.7, 0.9, (ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 2]] + ['s']
 
 # bend([delay, freq_shift, duration])
 num_bends = max(int((bend+1)/2), 1) # up to 8 bends
@@ -38,10 +38,12 @@ for ii in range(0, num_bends):
     else:
         bend_param = bend_param + ['{:.2f}'.format(x) for x in [(ii+1)*bend_duration/2, -300*(ii+1), bend_duration]]
 
-cmd = ['play', 'snuggle_puppy.wav', 'pitch', pitch_param]
+cmd = ['play', 'snuggle_puppy.wav']
+if (pitch > 0):
+    cmd = cmd + pitch_param
 if (chorus > 0):
     cmd = cmd + chorus_param
 if (bend > 0):
     cmd = cmd + bend_param
-
+print(cmd)
 stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
