@@ -1151,6 +1151,7 @@ config.status:1194: creating libnfc/drivers/Makefile
 config.status:1194: creating test/Makefile
 config.status:1194: creating utils/Makefile
 config.status:1194: creating config.h
+config.status:1375: config.h is unchanged
 config.status:1423: executing depfiles commands
 config.status:1500: cd examples       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for 'am--depfiles'.

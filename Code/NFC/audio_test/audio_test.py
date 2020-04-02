@@ -1,18 +1,19 @@
+#!/usr/bin/python3
+
 from pysndfx import AudioEffectsChain
 from playsound import playsound
 import audioread
 
 infile = 'snuggle_puppy.wav'
-outfile = 'snuggle_puppy_processed.wav'
 
 with audioread.audio_open(infile) as f:
     totalsec = f.duration
 
 # 0-15 values
-pitch = 8
-chorus = 15
-overdrive = 5
-bend = 5
+pitch = 12
+chorus = 0
+overdrive = 0
+bend = 0
 
 # Translate Switch Inputs
 pitch_param = (pitch-8)*100
@@ -37,8 +38,8 @@ for ii in range(0, num_bends):
     else:
         bend_param[ii] = [(ii+1)*bend_duration/2, -300*(ii+1), bend_duration]
     bend_param[ii] = [str(jj) for jj in bend_param[ii]]
-print(bend_param)
 
+fx = (AudioEffectsChain())
 fx.pitch(pitch_param)
 if (chorus > 0):
     fx.chorus(0.5, 0.9, chorus_param)
