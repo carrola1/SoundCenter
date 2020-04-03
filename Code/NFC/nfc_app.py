@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import audioread
 from subprocess import PIPE, Popen
 
 #cmd = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/libnfc/libnfc-1.7.0/examples/nfc-poll'
@@ -9,13 +8,12 @@ from subprocess import PIPE, Popen
 
 infile = 'snuggle_puppy.wav'
 
-with audioread.audio_open(infile) as f:
-    totalsec = f.duration
+totalsec = 14 #pre-program this for each wav file
 
 # 0-15 values
 pitch = 8
 chorus = 0
-bend = 1
+bend = 15
 
 # Translate Switch Inputs
 pitch_param = ['pitch', str((pitch-8)*100)]
@@ -31,7 +29,7 @@ for ii in range(0, max(int(chorus/3), 1)):
 # bend([delay, freq_shift, duration])
 num_bends = max(int((bend+1)/2), 1) # up to 8 bends
 bend_duration = (totalsec - 0.1)/num_bends/2
-bend_param = ['bend']
+bend_param = ['gain', '-5', 'bend', '-f', '80', '-o', '4']
 for ii in range(0, num_bends):
     if (ii % 2 == 0):
         bend_param = bend_param + [','.join(['{:.2f}'.format(x) for x in [(ii+1)*bend_duration/2, 300*(ii+1), bend_duration]])]
