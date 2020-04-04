@@ -90,7 +90,6 @@ main(int argc, const char *argv[])
   pnd = nfc_open(context, NULL);
 
   if (pnd == NULL) {
-    ERR("%s", "Unable to open NFC device.");
     nfc_exit(context);
     exit(EXIT_FAILURE);
   }
@@ -110,7 +109,7 @@ main(int argc, const char *argv[])
   }
 
   if (res > 0) {
-    print_nfc_target(&nt, False);
+    print_nfc_target(&nt, false);
   } else {
     printf("No target found.\n");
   }
