@@ -109,7 +109,9 @@ main(int argc, const char *argv[])
   }
 
   if (res > 0) {
-    print_nfc_target(&nt, false);
+    print_hex(nt.nti.nai.abtAtqa, 2);
+    printf("       UID (NFCID%c): ", (nt.nti.nai.abtUid[0] == 0x08 ? '3' : '1'));
+    print_hex(nt.nti.nai.abtUid, nt.nti.nai.szUidLen);
   } else {
     printf("No target found.\n");
   }
