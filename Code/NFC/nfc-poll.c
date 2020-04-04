@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <nfc.h>
+#include "nfc.h"
 
 static nfc_device *pnd = NULL;
 static nfc_context *context;
