@@ -51,12 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <nfc/nfc.h>
-#include <nfc/nfc-types.h>
-
-#include "utils/nfc-utils.h"
-
-#define MAX_DEVICE_COUNT 16
+#include <nfc.h>
 
 static nfc_device *pnd = NULL;
 static nfc_context *context;
