@@ -118,7 +118,7 @@ main(int argc, const char *argv[])
   }
 
   if (res > 0) {
-    print_hex(nt.nti.nai.abtUid, nt.nti.nai.szUidLen);
+    printf(nt.nti.nai.abtUid, nt.nti.nai.szUidLen);
   } else {
     printf("No target found.\n");
   }
