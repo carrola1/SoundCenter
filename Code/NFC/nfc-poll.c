@@ -67,17 +67,6 @@ static void stop_polling(int sig)
   }
 }
 
-static void
-print_hex(const uint8_t *pbtData, const size_t szBytes)
-{
-  size_t  szPos;
-
-  for (szPos = 0; szPos < szBytes; szPos++) {
-    printf("%02x  ", pbtData[szPos]);
-  }
-  printf("\n");
-}
-
 int
 main(int argc, const char *argv[])
 {

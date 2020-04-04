@@ -4,13 +4,13 @@ from subprocess import PIPE, Popen
 
 cmd = './nfc-poll'
 stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
-print(stdout)
+uid = stdout.hex()
 
 infile = 'snuggle_puppy.wav'
 
 totalsec = 14 #pre-program this for each wav file
 
-if (stdout == "15  b0  57  c9"):
+if (uid == "25b057c9"):
   # 0-15 values
   pitch = 8
   chorus = 0
