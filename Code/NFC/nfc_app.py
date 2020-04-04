@@ -2,7 +2,7 @@
 
 from subprocess import PIPE, Popen
 
-cmd = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/libnfc/libnfc-1.7.0/examples/nfc-poll'
+cmd = './nfc-poll'
 stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
 print(stdout)
 
