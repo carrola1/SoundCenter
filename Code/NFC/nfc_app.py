@@ -6,7 +6,7 @@ import smbus
 song_dict = {'25b057c9': 'snuggle_puppy.wav'} 
 
 i2cbus = smbus.SMBus(1)
-i2cbus.write_bute_data(0x44, 0x0D, 0xFF)  # set gpio expander inputs to have pull-ups
+i2cbus.write_byte_data(0x44, 0x0D, 0xFF)  # set gpio expander inputs to have pull-ups
 
 while(1):
   cmd = './nfc-poll'
@@ -18,6 +18,9 @@ while(1):
   totalsec = 14 #pre-program this for each wav file
 
   if (infile is Not None):
+    
+    i2cbus.read_byte_data(0x44, 0x0F)
+
     # 0-15 values
     pitch = 8
     chorus = 0
