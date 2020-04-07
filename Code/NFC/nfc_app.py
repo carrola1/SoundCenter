@@ -2,8 +2,14 @@
 
 from subprocess import PIPE, Popen
 import smbus
+import RPi.GPIO as GPIO
 
 song_dict = {'25b057c9': 'snuggle_puppy.wav'} 
+
+led_pin = 13
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(led_pin, GPIO.OUT)
+GPIO.output(led_pin, GPIO.LOW)
 
 i2cbus = smbus.SMBus(1)
 i2cbus.write_byte_data(0x44, 0x0D, 0xFF)  # set gpio expander inputs to have pull-ups
@@ -17,14 +23,15 @@ while(1):
 
   totalsec = 14 #pre-program this for each wav file
 
-  if (infile is Not None):
+  if (infile is not None):
     
-    i2cbus.read_byte_data(0x44, 0x0F)
+    GPIO.output(led_pin, GPIO.HIGH)
 
-    # 0-15 values
-    pitch = 8
+    pitch = (i2cbus.read_byte_data(0x44, 0x0F))^255 - 1
+
+    # 0-14 values
     chorus = 0
-    bend = 15
+    bend = 0
 
     # Translate Switch Inputs
     pitch_param = ['pitch', str((pitch-8)*100)]
@@ -56,3 +63,5 @@ while(1):
     if (bend > 0):
         cmd = cmd + bend_param
     stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
+
+    GPIO.output(led_pin, GPIO.LOW)
