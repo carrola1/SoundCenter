@@ -4,7 +4,7 @@ from subprocess import PIPE, Popen
 import smbus
 import RPi.GPIO as GPIO
 
-song_dict = {'25b057c9': 'snuggle_puppy.wav'} 
+song_dict = {'25b057c9': '../../Audio/red.wav'} 
 
 led_pin = 13
 GPIO.setmode(GPIO.BCM)
