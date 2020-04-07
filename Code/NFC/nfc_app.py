@@ -4,7 +4,8 @@ from subprocess import PIPE, Popen
 import smbus
 import RPi.GPIO as GPIO
 
-song_dict = {'25b057c9': '../../Audio/red.wav'} 
+song_dict = {'25b057c9': 'red.wav',
+             '85c4546a': 'green.wav'} 
 
 led_pin = 13
 GPIO.setmode(GPIO.BCM)
@@ -18,13 +19,16 @@ while(1):
   cmd = './nfc-poll'
   stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
   uid = stdout.hex()
+  print(uid)
 
   infile = song_dict.get(uid)
 
   totalsec = 14 #pre-program this for each wav file
 
-  if (infile is not None):
-    
+  if (infile is not None): 
+
+    infile = '../../Audio/' + infile
+
     GPIO.output(led_pin, GPIO.HIGH)
 
     pitch = (i2cbus.read_byte_data(0x44, 0x0F))^255 - 1
