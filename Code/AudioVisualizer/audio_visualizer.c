@@ -148,7 +148,7 @@
         /*******************************************************************/
         while(1) {
             if (gpioRead(25) == 0) {
-                for (int frame = 0; frame < 1000; frame++) {
+                for (int frame = 0; frame < 10000; frame++) {
                     /* Record some audio. ---------------------------------------- */
                     err = Pa_StartStream( stream );
                     if( err != paNoError ) goto done;
