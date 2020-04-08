@@ -4,10 +4,14 @@ from subprocess import PIPE, Popen
 import smbus
 import RPi.GPIO as GPIO
 
+app_path = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/'
+audio_path = '/home/pi/Documents/GitHub/SoundCenter/Audio/'
+
 song_dict = {'25b057c9': 'red.wav',
              '85c4546a': 'green.wav'} 
 
 led_pin = 13
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(led_pin, GPIO.OUT)
 GPIO.output(led_pin, GPIO.LOW)
@@ -16,7 +20,7 @@ i2cbus = smbus.SMBus(1)
 i2cbus.write_byte_data(0x44, 0x0D, 0xFF)  # set gpio expander inputs to have pull-ups
 
 while(1):
-  cmd = './nfc-poll'
+  cmd = app_path + 'nfc-poll'
   stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
   uid = stdout.hex()
   print(uid)
@@ -27,7 +31,7 @@ while(1):
 
   if (infile is not None): 
 
-    infile = '../../Audio/' + infile
+    infile = audio_path + infile
 
     GPIO.output(led_pin, GPIO.HIGH)
 
