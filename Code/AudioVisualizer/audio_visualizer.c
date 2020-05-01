@@ -134,7 +134,7 @@
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
 
         float max_val;
-        //int max_ind;
+        int max_ind;
 
         /*******************************************************************/
         // Initizalize GPIO
@@ -144,10 +144,16 @@
         gpioSetPullUpDown(25, PI_PUD_UP);
 
         /*******************************************************************/
+        // Create a log file
+        /*******************************************************************/
+        FILE *f;
+
+        /*******************************************************************/
         // Main loop
         /*******************************************************************/
         while(1) {
             if (gpioRead(25) == 0) {
+                f = fopen("/home/pi/Documents/GitHub/SoundCenter/Code/AudioVisualizer/fft_max.log", "w");
                 for (int frame = 0; frame < 10000; frame++) {
                     /* Record some audio. ---------------------------------------- */
                     err = Pa_StartStream( stream );
@@ -167,26 +173,20 @@
                     
                     /* Find max FFT bin and normalize----------------------------- */
                     max_val = 0.001;
-                    //max_ind = 2;
+                    max_ind = 2;
                     // Get real-sided magnitude
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
                         mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
                         if (mag[j] > max_val) {
                             max_val = mag[j];
-                            //max_ind = j;
+                            max_ind = j;
                         }
                     }
-                    //printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
+                    fprintf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
                     
                     // Normalize
-                    if (max_val > 20) {
-                        for (int j=0; j<NFFT/2+1; j++) {
-                            mag[j] = mag[j]/max_val*30.0;
-                        }
-                    } else {
-                        for (int j=0; j<NFFT/2+1; j++) {
-                            mag[j] = 0;
-                        }
+                    for (int j=0; j<NFFT/2+1; j++) {
+                        mag[j] = mag[j]/18000.0*30.0;
                     }
 
                     /* Update matrix. ------------------------------------------- */
@@ -212,7 +212,6 @@
                         }
                     }
                     offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
-                    
                 }
 
                 /* Shut off matrix after loop. ---------------------------------- */
@@ -222,6 +221,7 @@
                     }
                 }
                 offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+                fclose(f);
             }
         }
         
