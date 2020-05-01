@@ -8,7 +8,8 @@ app_path = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/'
 audio_path = '/home/pi/Documents/GitHub/SoundCenter/Audio/'
 
 song_dict = {'25b057c9': 'red.wav',
-             '85c4546a': 'green.wav'} 
+             '85c4546a': 'green.wav',
+             '8b893e7e': 'pete_the_cat.wav'} 
 
 # Setup GPIO
 GPIO.setwarnings(False)
