@@ -38,6 +38,7 @@
     
     #include <stdio.h>
     #include <stdlib.h>
+    #include <math.h>
     #include <unistd.h>
     #include <signal.h>
     #include "portaudio.h"
@@ -141,19 +142,13 @@
         /*******************************************************************/
         gpioInitialise();
         gpioSetMode(25, PI_INPUT);
-        gpioSetPullUpDown(25, PI_PUD_UP);
-
-        /*******************************************************************/
-        // Create a log file
-        /*******************************************************************/
-        FILE *f;
+        //gpioSetPullUpDown(25, PI_PUD_UP);
 
         /*******************************************************************/
         // Main loop
         /*******************************************************************/
         while(1) {
             if (gpioRead(25) == 0) {
-                f = fopen("/home/pi/Documents/GitHub/SoundCenter/Code/AudioVisualizer/fft_max.log", "w");
                 for (int frame = 0; frame < 10000; frame++) {
                     /* Record some audio. ---------------------------------------- */
                     err = Pa_StartStream( stream );
@@ -176,17 +171,23 @@
                     max_ind = 2;
                     // Get real-sided magnitude
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                        mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
+                        mag[j] = 20.0*log10(bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i);
                         if (mag[j] > max_val) {
                             max_val = mag[j];
                             max_ind = j;
                         }
                     }
-                    fprintf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
+                    //printf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
                     
                     // Normalize
+                    float mag_adj;
+                    if (gpioRead(25) == 0) {
+                        mag_adj = 61.0;
+                    } else {
+                        mag_adj = 18.0;
+                    }
                     for (int j=0; j<NFFT/2+1; j++) {
-                        mag[j] = mag[j]/18000.0*30.0;
+                        mag[j] = mag[j] - mag_adj;
                     }
 
                     /* Update matrix. ------------------------------------------- */
@@ -221,7 +222,6 @@
                     }
                 }
                 offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
-                fclose(f);
             }
         }
         
