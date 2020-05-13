@@ -116,13 +116,10 @@
         }
 
         int filt_len = 8;
-        float * mag_fifo[filt_len];
-        for (int i=0; i<filt_len; i++) {
-          mag_fifo[i] = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
-        }
+        float * mag_fifo = (float*)malloc(NUM_MATRIX_BINS*filt_len*sizeof(SAMPLE)/2);
         for (int i=0; i<filt_len; i++) {
           for (int j=0; j<NUM_MATRIX_BINS; j++) {
-            mag_fifo[i][j] = 0.0;
+            *(mag_fifo + i*NUM_MATRIX_BINS + j) = 0.0;
           }
         }
 
@@ -202,11 +199,11 @@
                     // Shift moving average fifo
                     for (int i=1; i<filt_len; i++) {
                       for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                        mag_fifo[i][j] = mag_fifo[i-1][j];
+                        *(mag_fifo + i*NUM_MATRIX_BINS + j) = *(mag_fifo + (i-1)*NUM_MATRIX_BINS + j);
                       }
                     }
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                      mag_fifo[0][j] = mag[j];
+                      *(mag_fifo + j) = mag[j];
                     }
 
                     //printf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
