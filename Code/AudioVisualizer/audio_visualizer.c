@@ -219,7 +219,7 @@
                         mag_adj = 15.0;
                     }
                     for (int j=0; j<NFFT/2+1; j++) {
-                        mag_filt[j] = mag_filt[j] - mag_filt;
+                        mag_filt[j] = mag_filt[j] - mag_adj;
                     }
 
                     /* Update matrix. ------------------------------------------- */
