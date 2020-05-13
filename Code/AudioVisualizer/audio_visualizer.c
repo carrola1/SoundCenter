@@ -105,7 +105,27 @@
         float * mag;
         mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
-        
+
+        /*******************************************************************/
+        // Initialize and configure moving average
+        /*******************************************************************/
+        float * mag_filt;
+        mag_filt = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
+        for (int j=0; j<NUM_MATRIX_BINS; j++) {
+          mag_filt[j] = 0.0;
+        }
+
+        int filt_len = 8;
+        float * mag_fifo[filt_len];
+        for (int i=0; i<filt_len; i++) {
+          mag_fifo[i] = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
+        }
+        for (int i=0; i<filt_len; i++) {
+          for (int j=0; j<NUM_MATRIX_BINS; j++) {
+            mag_fifo[i][j] = 0.0;
+          }
+        }
+
         /*******************************************************************/
         // Initialize RGB Matrix
         /*******************************************************************/
@@ -176,7 +196,19 @@
                             max_val = mag[j];
                             max_ind = j;
                         }
+                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[filt_len-1][j])/filt_len;
                     }
+
+                    // Shift moving average fifo
+                    for (int i=1; i<filt_len; i++) {
+                      for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                        mag_fifo[i][j] = mag_fifo[i-1][j];
+                      }
+                    }
+                    for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                      mag_fifo[0][j] = mag[j];
+                    }
+
                     //printf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
                     
                     // Normalize
@@ -184,16 +216,16 @@
                     if (gpioRead(25) == 0) {
                         mag_adj = 61.0;
                     } else {
-                        mag_adj = 18.0;
+                        mag_adj = 15.0;
                     }
                     for (int j=0; j<NFFT/2+1; j++) {
-                        mag[j] = mag[j] - mag_adj;
+                        mag_filt[j] = mag_filt[j] - mag_filt;
                     }
 
                     /* Update matrix. ------------------------------------------- */
                     for (y = 0; y < height; ++y) {
                         for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
-                            if (mag[x/MATRIX_BIN_WIDTH] >= y) {
+                            if (mag_filt[x/MATRIX_BIN_WIDTH] >= y) {
                                 for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
                                     if (y < 12) {
                                         led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
@@ -229,7 +261,7 @@
         if( err != paNoError ) goto done;
         
         free(cfg);
-        free(buf); free(bufout); free(mag); free(audio_data);
+        free(buf); free(bufout); free(mag); free(mag_filt); free(mag_fifo); free(audio_data);
         led_matrix_delete(matrix);
         printf("Done!\n");
    
