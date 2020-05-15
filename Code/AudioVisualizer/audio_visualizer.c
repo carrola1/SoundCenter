@@ -103,20 +103,20 @@
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
         bufout=(kiss_fft_cpx*)malloc(NFFT*sizeof(SAMPLE)*2);
         float * mag;
-        mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
+        mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE));
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
 
         /*******************************************************************/
         // Initialize and configure moving average
         /*******************************************************************/
         float * mag_filt;
-        mag_filt = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
+        mag_filt = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE));
         for (int j=0; j<NUM_MATRIX_BINS; j++) {
           mag_filt[j] = 0.0;
         }
 
         int filt_len = 8;
-        float * mag_fifo = (float*)malloc(NUM_MATRIX_BINS*filt_len*sizeof(SAMPLE)/2);
+        float * mag_fifo = (float*)malloc(NUM_MATRIX_BINS*filt_len*sizeof(SAMPLE));
         for (int i=0; i<filt_len; i++) {
           for (int j=0; j<NUM_MATRIX_BINS; j++) {
             *(mag_fifo + i*NUM_MATRIX_BINS + j) = 0.0;
@@ -188,12 +188,12 @@
                     max_ind = 2;
                     // Get real-sided magnitude
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                        mag[j] = 20.0*log10(bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i);
+                        mag[j] = (float)(20.0*log10(bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i));
                         if (mag[j] > max_val) {
                             max_val = mag[j];
                             max_ind = j;
                         }
-                        mag_filt[j] = (mag_filt[j] + mag[j] - *(mag_fifo + (filt_len-1)*NUM_MATRIX_BINS + j))/filt_len;
+                        mag_filt[j] = (mag_filt[j] + mag[j] - *(mag_fifo + (filt_len-1)*NUM_MATRIX_BINS + j))/(float)filt_len;
                     }
 
                     // Shift moving average fifo
