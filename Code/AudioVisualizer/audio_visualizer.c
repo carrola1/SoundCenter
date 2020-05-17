@@ -102,24 +102,22 @@
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
         bufout=(kiss_fft_cpx*)malloc(NFFT*sizeof(SAMPLE)*2);
-        float * mag;
-        mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE));
+        float mag[NUM_MATRIX_BINS];
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
 
         /*******************************************************************/
         // Initialize and configure moving average
         /*******************************************************************/
-        float * mag_filt;
-        mag_filt = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE));
+        float mag_filt[NUM_MATRIX_BINS];
         for (int j=0; j<NUM_MATRIX_BINS; j++) {
           mag_filt[j] = 0.0;
         }
 
         int filt_len = 8;
-        float * mag_fifo = (float*)malloc(NUM_MATRIX_BINS*filt_len*sizeof(SAMPLE));
+        float mag_fifo[filt_len][NUM_MATRIX_BINS];
         for (int i=0; i<filt_len; i++) {
           for (int j=0; j<NUM_MATRIX_BINS; j++) {
-            *(mag_fifo + i*NUM_MATRIX_BINS + j) = 0.0;
+            mag_fifo[i][j] = 0.0;
           }
         }
 
@@ -193,17 +191,17 @@
                             max_val = mag[j];
                             max_ind = j;
                         }
-                        mag_filt[j] = (mag_filt[j] + mag[j] - *(mag_fifo + (filt_len-1)*NUM_MATRIX_BINS + j))/(float)filt_len;
+                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[filt_len-1])/(float)filt_len;
                     }
 
                     // Shift moving average fifo
-                    for (int i=1; i<filt_len; i++) {
+                    for (int i=filt_len-1; i>0; i--) {
                       for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                        *(mag_fifo + i*NUM_MATRIX_BINS + j) = *(mag_fifo + (i-1)*NUM_MATRIX_BINS + j);
+                        mag_fifo[i][j] = mag_fifo[i-1][j];
                       }
                     }
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                      *(mag_fifo + j) = mag[j];
+                      mag_fifo[0][j] = mag[j];
                     }
 
                     //printf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
@@ -258,7 +256,7 @@
         if( err != paNoError ) goto done;
         
         free(cfg);
-        free(buf); free(bufout); free(mag); free(mag_filt); free(mag_fifo); free(audio_data);
+        free(buf); free(bufout); free(audio_data);
         led_matrix_delete(matrix);
         printf("Done!\n");
    
