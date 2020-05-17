@@ -50,6 +50,7 @@
     #define FRAMES_PER_BUFFER (2048)
     #define NFFT           (1024)
     #define NUM_MATRIX_BINS (32)
+    #define MA_FILT_LEN (8)
     
     /* Select sample format. */
     #define PA_SAMPLE_TYPE  paFloat32
@@ -113,9 +114,8 @@
           mag_filt[j] = 0.0;
         }
 
-        int filt_len = 8;
-        float mag_fifo[filt_len][NUM_MATRIX_BINS];
-        for (int i=0; i<filt_len; i++) {
+        float mag_fifo[MA_FILT_LEN][NUM_MATRIX_BINS];
+        for (int i=0; i<MA_FILT_LEN; i++) {
           for (int j=0; j<NUM_MATRIX_BINS; j++) {
             mag_fifo[i][j] = 0.0;
           }
@@ -191,11 +191,11 @@
                             max_val = mag[j];
                             max_ind = j;
                         }
-                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[filt_len-1][j])/(float)filt_len;
+                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[MA_FILT_LEN-1][j])/(float)MA_FILT_LEN;
                     }
 
                     // Shift moving average fifo
-                    for (int i=filt_len-1; i>0; i--) {
+                    for (int i=MA_FILT_LEN-1; i>0; i--) {
                       for (int j=0; j<NUM_MATRIX_BINS; j++) {
                         mag_fifo[i][j] = mag_fifo[i-1][j];
                       }
