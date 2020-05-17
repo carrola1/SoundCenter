@@ -191,7 +191,7 @@
                             max_val = mag[j];
                             max_ind = j;
                         }
-                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[filt_len-1])/(float)filt_len;
+                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[filt_len-1][j])/(float)filt_len;
                     }
 
                     // Shift moving average fifo
