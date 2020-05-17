@@ -109,9 +109,10 @@
         /*******************************************************************/
         // Initialize and configure moving average
         /*******************************************************************/
+        float mag_sum[NUM_MATRIX_BINS];
         float mag_filt[NUM_MATRIX_BINS];
         for (int j=0; j<NUM_MATRIX_BINS; j++) {
-          mag_filt[j] = 0.0;
+          mag_sum[j] = 0.0;
         }
 
         float mag_fifo[MA_FILT_LEN][NUM_MATRIX_BINS];
@@ -191,7 +192,8 @@
                             max_val = mag[j];
                             max_ind = j;
                         }
-                        mag_filt[j] = (mag_filt[j] + mag[j] - mag_fifo[MA_FILT_LEN-1][j])/(float)MA_FILT_LEN;
+                        mag_sum[j] = mag_sum[j] + mag[j] - mag_fifo[MA_FILT_LEN-1][j];
+                        mag_filt[j] = mag_sum[j]/(float)MA_FILT_LEN;
                     }
 
                     // Shift moving average fifo
