@@ -38,6 +38,7 @@
     
     #include <stdio.h>
     #include <stdlib.h>
+    #include <math.h>
     #include <unistd.h>
     #include <signal.h>
     #include "portaudio.h"
@@ -49,6 +50,7 @@
     #define FRAMES_PER_BUFFER (2048)
     #define NFFT           (1024)
     #define NUM_MATRIX_BINS (32)
+    #define MA_FILT_LEN (6)
     
     /* Select sample format. */
     #define PA_SAMPLE_TYPE  paFloat32
@@ -101,10 +103,25 @@
         kiss_fft_cpx * bufout;
         buf=(kiss_fft_scalar*)malloc(NFFT*sizeof(SAMPLE));
         bufout=(kiss_fft_cpx*)malloc(NFFT*sizeof(SAMPLE)*2);
-        float * mag;
-        mag = (float*)malloc(NUM_MATRIX_BINS*sizeof(SAMPLE)/2);
+        float mag[NUM_MATRIX_BINS];
         kiss_fftr_cfg cfg = kiss_fftr_alloc( NFFT ,0 ,0,0);
-        
+
+        /*******************************************************************/
+        // Initialize and configure moving average
+        /*******************************************************************/
+        float mag_sum[NUM_MATRIX_BINS];
+        float mag_filt[NUM_MATRIX_BINS];
+        for (int j=0; j<NUM_MATRIX_BINS; j++) {
+          mag_sum[j] = 0.0;
+        }
+
+        float mag_fifo[MA_FILT_LEN][NUM_MATRIX_BINS];
+        for (int i=0; i<MA_FILT_LEN; i++) {
+          for (int j=0; j<NUM_MATRIX_BINS; j++) {
+            mag_fifo[i][j] = 0.0;
+          }
+        }
+
         /*******************************************************************/
         // Initialize RGB Matrix
         /*******************************************************************/
@@ -134,14 +151,14 @@
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
 
         float max_val;
-        //int max_ind;
+        int max_ind;
 
         /*******************************************************************/
         // Initizalize GPIO
         /*******************************************************************/
         gpioInitialise();
         gpioSetMode(25, PI_INPUT);
-        gpioSetPullUpDown(25, PI_PUD_UP);
+        //gpioSetPullUpDown(25, PI_PUD_UP);
 
         /*******************************************************************/
         // Main loop
@@ -167,32 +184,45 @@
                     
                     /* Find max FFT bin and normalize----------------------------- */
                     max_val = 0.001;
-                    //max_ind = 2;
+                    max_ind = 2;
                     // Get real-sided magnitude
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
-                        mag[j] = bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i;
+                        mag[j] = (float)(20.0*log10(bufout[j+2].r*bufout[j+2].r + bufout[j+2].i*bufout[j+2].i));
                         if (mag[j] > max_val) {
                             max_val = mag[j];
-                            //max_ind = j;
+                            max_ind = j;
                         }
+                        mag_sum[j] = mag_sum[j] + mag[j] - mag_fifo[MA_FILT_LEN-1][j];
+                        mag_filt[j] = mag_sum[j]/(float)MA_FILT_LEN;
                     }
-                    //printf("Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
+
+                    // Shift moving average fifo
+                    for (int i=MA_FILT_LEN-1; i>0; i--) {
+                      for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                        mag_fifo[i][j] = mag_fifo[i-1][j];
+                      }
+                    }
+                    for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                      mag_fifo[0][j] = mag[j];
+                    }
+
+                    //printf(f, "Frame %i: \tMax Freq = %i Hz\tMax value = %f\n", frame, max_ind*SAMPLE_RATE/2/NFFT*2, max_val);
                     
                     // Normalize
-                    if (max_val > 20) {
-                        for (int j=0; j<NFFT/2+1; j++) {
-                            mag[j] = mag[j]/max_val*30.0;
-                        }
+                    float mag_adj;
+                    if (gpioRead(25) == 0) {
+                        mag_adj = 50.0;
                     } else {
-                        for (int j=0; j<NFFT/2+1; j++) {
-                            mag[j] = 0;
-                        }
+                        mag_adj = 15.0;
+                    }
+                    for (int j=0; j<NUM_MATRIX_BINS; j++) {
+                        mag_filt[j] = mag_filt[j] - mag_adj;
                     }
 
                     /* Update matrix. ------------------------------------------- */
                     for (y = 0; y < height; ++y) {
                         for (x = 0; x < width; x+=MATRIX_BIN_WIDTH) {
-                            if (mag[x/MATRIX_BIN_WIDTH] >= y) {
+                            if (mag_filt[x/MATRIX_BIN_WIDTH] >= y) {
                                 for (int k = 0; k < MATRIX_BIN_WIDTH; ++k) {
                                     if (y < 12) {
                                         led_canvas_set_pixel(offscreen_canvas, x+k, 31-y, 1, 1, 100);
@@ -212,7 +242,6 @@
                         }
                     }
                     offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
-                    
                 }
 
                 /* Shut off matrix after loop. ---------------------------------- */
@@ -229,7 +258,7 @@
         if( err != paNoError ) goto done;
         
         free(cfg);
-        free(buf); free(bufout); free(mag); free(audio_data);
+        free(buf); free(bufout); free(audio_data);
         led_matrix_delete(matrix);
         printf("Done!\n");
    

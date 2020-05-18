@@ -7,9 +7,14 @@ import RPi.GPIO as GPIO
 app_path = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/'
 audio_path = '/home/pi/Documents/GitHub/SoundCenter/Audio/'
 
-song_dict = {'25b057c9': 'red.wav',
-             '85c4546a': 'green.wav',
-             '8b893e7e': 'pete_the_cat.wav'} 
+song_dict = {'B5CC57C9': '01_Blues_Clues.wav',
+             '8B893E7E': '02_Bubble_Guppies.wav',
+             '055F57C9': '03_Paw_Patrol.wav',
+             '8BCC3E7E': '04_Pete_The_Cat.wav',
+             '15F557C9': '05_Storybots.wav',
+             '35A657C9': '06_Elsa.wav',
+             'E57457C9': '07_Elmo.wav',
+             'E56A57C9': '08_Snuggle_Puppy.wav'}
 
 # Setup GPIO
 GPIO.setwarnings(False)
