@@ -50,7 +50,7 @@
     #define FRAMES_PER_BUFFER (2048)
     #define NFFT           (1024)
     #define NUM_MATRIX_BINS (32)
-    #define MA_FILT_LEN (4)
+    #define MA_FILT_LEN (6)
     
     /* Select sample format. */
     #define PA_SAMPLE_TYPE  paFloat32
