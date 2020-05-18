@@ -73,7 +73,7 @@ main(int argc, const char *argv[])
 
   signal(SIGINT, stop_polling);
 
-  const uint8_t uiPollNr = 20;
+  const uint8_t uiPollNr = 2;
   const uint8_t uiPeriod = 2;
   const nfc_modulation nmModulations[1] = {
     { .nmt = NMT_ISO14443A, .nbr = NBR_106 },

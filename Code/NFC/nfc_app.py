@@ -29,13 +29,19 @@ for pin in echo_sw_pins:
 i2cbus = smbus.SMBus(1)
 i2cbus.write_byte_data(0x44, 0x0D, 0xFF)  # set gpio expander inputs to have pull-ups
 
+uid = None
+
 while(1):
   cmd = app_path + 'nfc-poll'
   stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
-  uid = stdout.hex()
-  print(uid)
+  uid_new = stdout.hex()
+  print(uid_new)
 
-  infile = song_dict.get(uid)
+  if (uid != uid_new):
+    infile = song_dict.get(uid_new)
+  else:
+    infile = None
+  uid = uid_new
 
   if (infile is not None): 
 
