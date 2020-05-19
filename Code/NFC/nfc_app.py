@@ -7,14 +7,14 @@ import RPi.GPIO as GPIO
 app_path = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/'
 audio_path = '/home/pi/Documents/GitHub/SoundCenter/Audio/'
 
-song_dict = {'B5CC57C9': '01_Blues_Clues.wav',
-             '8B893E7E': '02_Bubble_Guppies.wav',
-             '055F57C9': '03_Paw_Patrol.wav',
-             '8BCC3E7E': '04_Pete_The_Cat.wav',
-             '15F557C9': '05_Storybots.wav',
-             '35A657C9': '06_Elsa.wav',
-             'E57457C9': '07_Elmo.wav',
-             'E56A57C9': '08_Snuggle_Puppy.wav'}
+song_dict = {'b5cc57c9': '01_Blues_Clues.wav',
+             '8b893e7e': '02_Bubble_Guppies.wav',
+             '055f57c9': '03_Paw_Patrol.wav',
+             '8bcc3e7e': '04_Pete_The_Cat.wav',
+             '15f557c9': '05_Storybots.wav',
+             '35a657c9': '06_Elsa.wav',
+             'e57457c9': '07_Elmo.wav',
+             'e56a57c9': '08_Snuggle_Puppy.wav'}
 
 # Setup GPIO
 GPIO.setwarnings(False)
@@ -83,7 +83,7 @@ while(1):
         echo_param = echo_param + ['{:.2f}'.format(x) for x in [800, 0.4]]
         echo_param = echo_param + ['{:.2f}'.format(x) for x in [echo*100, 0.3]]
 
-    cmd = ['play', infile, 'gain', '-5']
+    cmd = ['play', infile, 'gain', '-15']
     if ((pitch < 7) | (pitch > 8)):
         cmd = cmd + pitch_param
     if (chorus > 0):
