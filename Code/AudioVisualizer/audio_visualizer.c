@@ -48,9 +48,11 @@
     
     #define SAMPLE_RATE  (44100)
     #define FRAMES_PER_BUFFER (2048)
-    #define NFFT           (1024)
+    #define NFFT (1024)
     #define NUM_MATRIX_BINS (32)
-    #define MA_FILT_LEN (6)
+    #define MA_FILT_LEN (5)
+    #define GAIN_ADJ_MUSIC (35)
+    #define GAIN_ADJ_NORM (15)
     
     /* Select sample format. */
     #define PA_SAMPLE_TYPE  paFloat32
@@ -211,9 +213,9 @@
                     // Normalize
                     float mag_adj;
                     if (gpioRead(25) == 0) {
-                        mag_adj = 50.0;
+                        mag_adj = (float)GAIN_ADJ_MUSIC;
                     } else {
-                        mag_adj = 15.0;
+                        mag_adj = (float)GAIN_ADJ_NORM;
                     }
                     for (int j=0; j<NUM_MATRIX_BINS; j++) {
                         mag_filt[j] = mag_filt[j] - mag_adj;
