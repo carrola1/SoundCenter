@@ -51,7 +51,7 @@
     #define NFFT (1024)
     #define NUM_MATRIX_BINS (32)
     #define MA_FILT_LEN (5)
-    #define GAIN_ADJ_MUSIC (35)
+    #define GAIN_ADJ_MUSIC (50)
     #define GAIN_ADJ_NORM (15)
     
     /* Select sample format. */
