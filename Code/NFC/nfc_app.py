@@ -8,7 +8,7 @@ app_path = '/home/pi/Documents/GitHub/SoundCenter/Code/NFC/'
 audio_path = '/home/pi/Documents/GitHub/SoundCenter/Audio/'
 
 song_dict = {'b5cc57c9': '01_Blues_Clues.wav',
-             '8b893e7e': '02_Bubble_Guppies.wav',
+             '85c4546a': '02_Bubble_Guppies.wav',
              '055f57c9': '03_Paw_Patrol.wav',
              '8bcc3e7e': '04_Pete_The_Cat.wav',
              '15f557c9': '05_Storybots.wav',
@@ -76,7 +76,7 @@ while(1):
             chorus_param = chorus_param + ['{:.2f}'.format(x) for x in [(ii+1)*20, 0.3+0.03*(ii-2), 0.25+0.05*(ii-2), 2]] + ['-s']
 
     # echo(gain-in, gain-out, [delay, decay])
-    echo_param = ['echo', '0.8', '0.9']
+    echo_param = ['echo', '0.9', '0.95']
     if (echo < 9):
         echo_param = echo_param + ['{:.2f}'.format(x) for x in [echo*100, 0.4]]
     else:
