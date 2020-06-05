@@ -14,7 +14,8 @@ song_dict = {'b5cc57c9': '01_Blues_Clues.wav',
              '15f557c9': '05_Storybots.wav',
              '35a657c9': '06_Elsa.wav',
              'e57457c9': '07_Elmo.wav',
-             'e56a57c9': '08_Snuggle_Puppy.wav'}
+             'e56a57c9': '08_Snuggle_Puppy.wav',
+             '25b057c9': '09_Octonauts.wav'}
 
 # Setup GPIO
 GPIO.setwarnings(False)
