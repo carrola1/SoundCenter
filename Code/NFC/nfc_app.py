@@ -84,7 +84,10 @@ while(1):
         echo_param = echo_param + ['{:.2f}'.format(x) for x in [800, 0.4]]
         echo_param = echo_param + ['{:.2f}'.format(x) for x in [echo*100, 0.3]]
 
-    cmd = ['play', infile, 'gain', '-15']
+    if ((echo > 0) or (chorus > 0)):
+      cmd = ['play', infile, 'gain', '-10']
+    else:
+      cmd = ['play', infile, 'gain', '-15']
     if ((pitch < 7) | (pitch > 8)):
         cmd = cmd + pitch_param
     if (chorus > 0):
